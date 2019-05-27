@@ -31,6 +31,47 @@ def transformPath(path):
 			sol += pathSplit[i]
 	return sol
 
+
+# Obtiene la key de la url introducida por teclado
+def getKey(url):
+	try:
+		urlSplit = url.split("=", 1)
+		key = urlSplit[1]
+		return key
+	except:
+		os.system("clear")
+		print("URL invalida.")
+		return ""
+
+
+# Obtiene el path donde se va a almacenar la canción o el video
+def getPath():
+	Tk().withdraw()
+	resp = ""
+	# El bucle controla que no se introduzca una respuesta que pueda dar error.
+	while True:
+		resp = input("¿Desea seleccionar el directorio donde guardar "+
+		"audio/video/lista (por defecto se guardará en "+music+")?(s/n): ")
+		if resp == 'S' or resp == 's' or resp == 'N' or resp == 'n':
+			break
+		else:
+			print("Respuesta introducida incorrecta.")
+	if resp == 'S' or resp == 's':
+		# seleccionar directorio donde guardar.
+		path = filedialog.askdirectory(initialdir=music)
+		# Si le da al boton cancelar recibirá una tupla vacía.
+		# Se hace la comprobación para que no haya errores a la
+		# hora de transformar el path.
+		if path:
+			directory = transformPath(path)
+		else:
+			directory = music
+		
+	else:
+		directory = music
+
+	return directory
+
 directory = ""
 invalida = False
 lista = False
@@ -45,7 +86,7 @@ os.system("sudo pip3 install --upgrade youtube-dl")
 # la carpeta Musica la busca como Music (solo contempla de 
 # momento el español y el ingles)
 music = str(Path.home())+"/Musica"
-if os.path.exists(music) == False:
+if os.path.exists(music) is False:
 	music = str(Path.home())+"/Music"
 
 while True:
@@ -57,88 +98,43 @@ while True:
 	opcion = int(input("Introduce opcion: "))
 	os.system("clear")
 
+	# Obtención de audio.
 	if opcion == 1:
 		url = input("Introduce url: ")
-		try:
-			urlSplit = url.split("=", 1)
-			key = urlSplit[1]
-		except:
-			os.system("clear")
-			print("URL invalida.")
-			invalida = True
+		key = getKey(url=url)
 
-		try:
-			if invalida == False:
-				Tk().withdraw()
-				resp = ""
-				while True: #El bucle controla que no se introduzca una respuesta que pueda dar error.
-					resp = input("¿Desea seleccionar el directorio donde guardar el audio (por defecto se guardará en "+music+")?(s/n): ")
-					if resp == 'S' or resp == 's' or resp == 'N' or resp == 'n':
-						break
-					else:
-						print("Respuesta introducida incorrecta.")
-				if resp == 'S' or resp == 's':
-					path = filedialog.askdirectory(initialdir = music) # seleccionar directorio donde guardar.
-					directory = transformPath(path)
-					res = os.system("youtube-dl -x --audio-format mp3 --audio-quality 0 -o "+directory+"/'%(title)s.%(ext)s'"+" "+key)
-				else:
-					directory = music
-					res = os.system("youtube-dl -x --audio-format mp3 --audio-quality 0 -o "+directory+"/'%(title)s.%(ext)s'"+" "+key) #Elimina incluir al final del nombre la key del video de youtube.
-				#os.system("clear")
-		except:
-			print("No se ha podido obtener el valor key.")
-
-		try:
-			if invalida == False:
-				if res == 256:
-					print("Se ha producido un error en la conversion")
-					print()
-				elif res == 0:
-					print("La conversion se ha realizado con exito y se ha guardado en el directorio: "+directory)
-					print()
-		except:
-			print()
-	elif opcion==2:
+		if key != "":
+			directory = getPath()
+			res = os.system("youtube-dl -x --audio-format mp3 --audio-quality 0 -o"+
+			directory+"/'%(title)s.%(ext)s'"+" "+key)
+			if res == 256:
+				print("Se ha producido un error en la conversion")
+				print()
+			elif res == 0:
+				print("La conversion se ha realizado con exito y se ha guardado en"+
+				"el directorio: "+directory)
+				print()
+		elif key == "":
+			print("No se ha podido obtener el valor de la key.")
+	# Obtención de vídeo		
+	elif opcion == 2:
 		url = input("Introduce url: ")
-		try:
-			urlSplit = url.split("=", 1)
-			key = urlSplit[1]
-		except:
-			os.system("clear")
-			print("URL invalida.")
-			invalida = True
+		key = getKey(url=url)
 
-		try:
-			if invalida == False:
-				Tk().withdraw()
-				resp = ""
-				while True: #El bucle controla que no se introduzca una respuesta que pueda dar error.
-					resp = input("¿Desea seleccionar el directorio donde guardar el vídeo (por defecto se guardará en "+music+")?(s/n): ")
-					if resp == 'S' or resp == 's' or resp == 'N' or resp == 'n':
-						break
-					else:
-						print("Respuesta introducida incorrecta.")
-				if resp == 'S' or resp == 's':
-					path = filedialog.askdirectory(initialdir = music) # seleccionar directorio donde guardar.
-					directory = transformPath(path)
-					res = os.system("youtube-dl -f mp4 -o "+directory+"/'%(title)s.%(ext)s'"+" "+key)
-				else:
-					directory = music
-					res = os.system("youtube-dl -f mp4 -o "+directory+"/'%(title)s.%(ext)s'"+" "+key)
-				#os.system("clear")
-		except:
-			print("No se ha podido obtener el valor key.")
-
-		try:
-			if invalida == False:
-				if res == 256:
-					print("Se ha producido un error en la descarga")
-					print()
-				elif res == 0:
-					print("El video se ha descargado con exito y se ha guardado en el directorio: "+directory)
-					print()
-		except:
-			print()
+		if key != "":
+			directory = getPath()
+			res = os.system("youtube-dl -f mp4 -o "+directory+"/'%(title)s.%(ext)s'"+
+			" "+key)
+			if res == 256:
+				print("Se ha producido un error en la conversion")
+				print()
+			elif res == 0:
+				print("La conversion se ha realizado con exito y se ha guardado en"+
+				"el directorio: "+directory)
+				print()
+		elif key == "":
+			print("No se ha podido obtener el valor de la key.")
+	# Obtención de lista			
 	elif opcion==3:
 		url = input("Introduce url: ")
 		try:
@@ -148,24 +144,17 @@ while True:
 			os.system("clear")
 			print("URL invalida.")
 			invalida = True
-		lista = True;
+		lista = True
 		break
+	# Salida del programa
 	elif opcion==4:
 		break
 
 if lista:
-	while True: #El bucle controla que no se introduzca una respuesta que pueda dar error.
-		resp = input("¿Desea seleccionar el directorio donde guardar la lista (por defecto se guardará en "+music+")?(s/n): ")
-		if resp == 'S' or resp == 's' or resp == 'N' or resp == 'n':
-			break
-		else:
-			print("Respuesta introducida incorrecta.")
-	if resp == 'S' or resp == 's':
-		path = filedialog.askdirectory(initialdir = music) # seleccionar directorio donde guardar.
-		directory = transformPath(path)
-		res = os.system("youtube-dl -i -x --audio-format mp3 --audio-quality 0 -o "+directory+"/'%(title)s.%(ext)s'"+" "+key)
-	else:
-		directory = music
-		res = os.system("youtube-dl -i -x --audio-format mp3 --audio-quality 0 -o "+directory+"/'%(title)s.%(ext)s'"+" "+key)
-		#-i evita que si un video no se puede descargar se deje de descargar toda la lista completa.
+	os.system("youtube-dl -i -x --audio-format mp3 --audio-quality 0 "+key)
+	# TODO 
+	# Arreglar que la descarga de la lista no se pueda interrumpir con CTRL C cuando se le añade un directorio
+	# donde guardar las canciones descargadas. 
+	# res = os.system("youtube-dl -i -x --audio-format mp3 --audio-quality 0 -o "+directory+"/'%(title)s.%(ext)s'"+" "+key)
+
 	
