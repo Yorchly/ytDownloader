@@ -1,16 +1,12 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
 """
-En Manjaro tengo instalada una version 3.6.8 a parte de la versión 3.7 
-instalada y cuando pongo python3 coge esta versión que está en 
-/usr/local/bin en por lo que muchos paquetes de /usr/bin no 
-los detecta. Si no funciona bien cambiar el shebang de 
-#!/usr/bin/env python3.7 -> #!/usr/bin/env python3.
--------------------------------------------------------------------------------
 Este programa esta diseñado para funcionar en python 3, además se debe 
 tener instalado la herramienta pip para descarga de paquetes y tkinter.
 Si no se dispone del interprete, pip y tkinter, ejecutar el script 
 installer.sh.
-Version funcional en ubuntu 18.04 LTS y en Manjaro 18.0.4
+Version funcional en ubuntu 18.04 LTS y en Manjaro 18.0.4.
+Si no funciona bien porque detecta mal el interprete de python, cambiar
+#!/usr/bin/env python3 -> #!/usr/bin/env python3.7
 """
 import os
 from tkinter import Tk
@@ -73,7 +69,6 @@ def getPath():
 	return directory
 
 directory = ""
-invalida = False
 lista = False
 
 # Evita posibles errores a la hora de intentar descargar una cancion 
@@ -85,9 +80,9 @@ os.system("sudo pip3 install --upgrade youtube-dl")
 # las canciones y vídeos que se descargue. Si no encuentra
 # la carpeta Musica la busca como Music (solo contempla de 
 # momento el español y el ingles)
-music = str(Path.home())+"/Musica"
+music = str(Path.home()) + "/Musica"
 if os.path.exists(music) is False:
-	music = str(Path.home())+"/Music"
+	music = str(Path.home()) + "/Music"
 
 while True:
 	print("MENU")
@@ -135,7 +130,7 @@ while True:
 		elif key == "":
 			print("No se ha podido obtener el valor de la key.")
 	# Obtención de lista			
-	elif opcion==3:
+	elif opcion == 3:
 		url = input("Introduce url: ")
 		try:
 			urlSplit = url.split("list=", 1)
@@ -147,10 +142,10 @@ while True:
 		lista = True
 		break
 	# Salida del programa
-	elif opcion==4:
+	elif opcion == 4:
 		break
 
-if lista:
+if lista is True:
 	os.system("youtube-dl -i -x --audio-format mp3 --audio-quality 0 "+key)
 	# TODO 
 	# Arreglar que la descarga de la lista no se pueda interrumpir con CTRL C cuando se le añade un directorio
