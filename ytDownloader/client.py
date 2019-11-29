@@ -1,5 +1,4 @@
 import youtube_dl
-import os
 
 
 class YoutubeDownloader:
@@ -29,18 +28,5 @@ class YoutubeDownloader:
                 res = "Error {}".format(e)
             return res
 
-    def create_and_set_directory(self, path=None):
-        import ipdb; ipdb.set_trace()
-        path = path or os.path.join(os.getcwd(), "music")
-        try:
-            os.mkdir(path)
-            update = True
-        except FileExistsError:
-            update = True
-        except OSError as e:
-            return "Error creating directory: {}".format(e)
-
-        if update:
-            self.ydl_opts.update({'outtmpl': path + '/%(title)s.%(ext)s'})
-
-        return path
+    def updating_path_for_saving(self, path):
+        self.ydl_opts.update({'outtmpl': path + '/%(title)s.%(ext)s'})
